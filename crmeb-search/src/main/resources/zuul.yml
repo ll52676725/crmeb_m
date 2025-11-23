@@ -1,0 +1,9 @@
+zuul:
+  routes:
+    crmeb-search:
+      path: /search/**
+      serviceId: crmeb-search
+      stripPrefix: false
+  host:
+    connect-timeout-millis: 5000
+    socket-timeout-millis: 5000

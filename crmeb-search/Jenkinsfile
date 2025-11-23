@@ -1,0 +1,74 @@
+pipeline {
+    agent any
+
+    environment {
+        MAVEN_HOME = tool 'Maven 3.6.3'
+        JAVA_HOME = tool 'JDK 1.8'
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Build') {
+            steps {
+                sh "${MAVEN_HOME}/bin/mvn clean package -DskipTests"
+            }
+        }
+
+        stage('Test') {
+            steps {
+                sh "${MAVEN_HOME}/bin/mvn test"
+            }
+            post {
+                always {
+                    junit 'target/surefire-reports/*.xml'
+                }
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                sh "docker build -t crmeb/crmeb-search:${BUILD_NUMBER} ."
+                sh "docker tag crmeb/crmeb-search:${BUILD_NUMBER} crmeb/crmeb-search:latest"
+            }
+        }
+
+        stage('Push Docker Image') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'docker-hub', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
+                    sh "docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}"
+                    sh "docker push crmeb/crmeb-search:${BUILD_NUMBER}"
+                    sh "docker push crmeb/crmeb-search:latest"
+                }
+            }
+        }
+
+        stage('Deploy to Production') {
+            when {
+                branch 'master'
+            }
+            steps {
+                sshagent(['production-server']) {
+                    sh "ssh user@production-server 'docker pull crmeb/crmeb-search:${BUILD_NUMBER} && docker-compose up -d'"
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            emailext subject: 'Build Successful: ${JOB_NAME} #${BUILD_NUMBER}',
+                body: 'The build for ${JOB_NAME} #${BUILD_NUMBER} was successful. You can view the build results at ${BUILD_URL}.',
+                to: 'dev@crmeb.com'
+        }
+        failure {
+            emailext subject: 'Build Failed: ${JOB_NAME} #${BUILD_NUMBER}',
+                body: 'The build for ${JOB_NAME} #${BUILD_NUMBER} failed. You can view the build results at ${BUILD_URL}.',
+                to: 'dev@crmeb.com'
+        }
+    }
+}

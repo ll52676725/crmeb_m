@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: crmeb-search
+  cloud:
+    nacos:
+      discovery:
+        server-addr: localhost:8848
+      config:
+        server-addr: localhost:8848
+        file-extension: yml
+        group: DEFAULT_GROUP
+  profiles:
+    active: dev

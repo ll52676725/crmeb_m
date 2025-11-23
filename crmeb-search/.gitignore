@@ -1,0 +1,28 @@
+# Maven
+/target/
+/.mvn/
+/mvnw
+/mvnw.cmd
+
+# IDE
+/.idea/
+/.eclipse/
+/.project/
+/.classpath/
+/.settings/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
+
+# Configuration
+application-dev.yml
+application-test.yml
+application-prod.yml
+
+# HanLP
+hanlp/data/

@@ -1,0 +1,51 @@
+version: '3.7'
+
+services:
+  crmeb-search:
+    build: .
+    ports:
+      - "8085:8085"
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/crmeb?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=password
+      - SPRING_REDIS_HOST=redis
+      - SPRING_REDIS_PORT=6379
+      - SPRING_REDIS_PASSWORD=password
+    depends_on:
+      - mysql
+      - redis
+    networks:
+      - crmeb-network
+
+  mysql:
+    image: mysql:5.7
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=password
+      - MYSQL_DATABASE=crmeb
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - crmeb-network
+
+  redis:
+    image: redis:5.0
+    ports:
+      - "6379:6379"
+    environment:
+      - REDIS_PASSWORD=password
+    volumes:
+      - redis_data:/data
+    networks:
+      - crmeb-network
+
+volumes:
+  mysql_data:
+  redis_data:
+
+networks:
+  crmeb-network:
+    driver: bridge
