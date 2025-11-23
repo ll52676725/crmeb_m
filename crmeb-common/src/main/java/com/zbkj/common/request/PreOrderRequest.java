@@ -34,4 +34,10 @@ public class PreOrderRequest {
     @ApiModelProperty(value = "订单详情列表")
     private List<PreOrderDetailRequest> orderDetails;
 
+    @ApiModelProperty(value = "验证码")
+    private String captcha;
+
+    @ApiModelProperty(value = "验证码key")
+    private String captchaKey;
+
 }
