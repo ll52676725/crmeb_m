@@ -103,4 +103,41 @@ public class RequestUtil extends HttpServlet{
         list.removeIf(c -> c.contains(","));// 去掉url中的逗号分隔参数
         return StringUtils.join(list, "/");
     }
+
+    /**
+     * 获取客户端IP地址
+     * @return String
+     */
+    public static String getClientIP() {
+        HttpServletRequest request = getRequest();
+        if (request == null) {
+            return "unknown";
+        }
+        String ip = request.getHeader("x-forwarded-for");
+        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("Proxy-Client-IP");
+        }
+        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("WL-Proxy-Client-IP");
+        }
+        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getRemoteAddr();
+        }
+        // 如果是多级代理，取第一个非unknown的IP
+        if (ip != null && ip.contains(",")) {
+            String[] ips = ip.split(",");
+            for (String s : ips) {
+                if (!"unknown".equalsIgnoreCase(s)) {
+                    ip = s.trim();
+                    break;
+                }
+            }
+        }
+        // 本地访问
+        if ("0:0:0:0:0:0:0:1".equals(ip) || "127.0.0.1".equals(ip)) {
+            // 本地IP
+            ip = "127.0.0.1";
+        }
+        return ip;
+    }
 }

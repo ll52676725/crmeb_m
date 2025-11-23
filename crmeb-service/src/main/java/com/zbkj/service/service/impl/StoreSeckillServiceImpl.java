@@ -25,6 +25,8 @@ import com.zbkj.common.response.*;
 import com.zbkj.common.utils.CrmebUtil;
 import com.zbkj.common.utils.DateUtil;
 import com.zbkj.common.utils.RedisUtil;
+import com.zbkj.common.utils.RequestUtil;
+
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -850,12 +852,33 @@ public class StoreSeckillServiceImpl extends ServiceImpl<StoreSeckillDao, StoreS
     }
 
     /**
+     * 限流检查
+     * @param key 限流key
+     * @param maxCount 最大访问次数
+     * @param expireTime 过期时间（秒）
+     * @return 是否通过限流
+     */
+    private boolean isRateLimit(String key, int maxCount, int expireTime) {
+        String redisKey = "rate_limit:" + key;
+        Long count = redisUtil.incr(redisKey, 1);
+        if (count == 1) {
+            redisUtil.expire(redisKey, expireTime);
+        }
+        return count <= maxCount;
+    }
+
+    /**
      * 获取秒杀首页信息
      * 当前时段秒杀信息 + 当前时段秒杀商品6条
      * @return SeckillIndexResponse
      */
     @Override
     public SeckillIndexResponse getIndexInfo() {
+        // 限流检查，每个IP每分钟最多访问10次
+        String ip = RequestUtil.getClientIP();
+        if (!isRateLimit("seckill_index:" + ip, 10, 60)) {
+            throw new CrmebException("访问过于频繁，请稍后再试");
+        }
         StoreSeckillManger storeSeckillManger = new StoreSeckillManger();
         storeSeckillManger.setIsDel(false);
         // 根据当前时间过滤 仅处理正在进行的秒杀

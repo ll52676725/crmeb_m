@@ -908,6 +908,16 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public MyRecord createOrder(CreateOrderRequest request) {
         User user = userService.getInfoException();
+        // 限流检查，每个用户每分钟最多提交2次订单
+        String key = "order_create:" + user.getId();
+        String redisKey = "rate_limit:" + key;
+        Long count = redisUtil.incr(redisKey, 1);
+        if (count == 1) {
+            redisUtil.expire(redisKey, 60);
+        }
+        if (count > 2) {
+            throw new CrmebException("提交订单过于频繁，请稍后再试");
+        }
         // 通过缓存获取预下单对象
         String key = "user_order:" + request.getPreOrderNo();
         boolean exists = redisUtil.exists(key);
@@ -928,6 +938,17 @@ public class OrderServiceImpl implements OrderService {
 
         // 校验商品库存
         List<MyRecord> skuRecordList = validateProductStock(orderInfoVo, user);
+
+        // 秒杀商品添加分布式锁，防止并发超卖
+        if (orderInfoVo.getSeckillId() > 0) {
+            String lockKey = "seckill_lock:" + orderInfoVo.getSeckillId() + ":" + skuRecordList.get(0).getInt("activityAttrValueId");
+            boolean lock = redisUtil.tryLock(lockKey, 3000, 5000);
+            if (!lock) {
+                throw new CrmebException("抢购人数过多，请稍后再试");
+            }
+            // 再次校验库存，防止锁等待期间库存被耗尽
+            skuRecordList = validateProductStock(orderInfoVo, user);
+        }
 
         // 校验收货信息
         String verifyCode = "";
@@ -1177,12 +1198,23 @@ public class OrderServiceImpl implements OrderService {
             return Boolean.TRUE;
         });
         if (!execute) {
+            // 释放分布式锁
+            if (orderInfoVo.getSeckillId() > 0) {
+                String lockKey = "seckill_lock:" + orderInfoVo.getSeckillId() + ":" + skuRecordList.get(0).getInt("activityAttrValueId");
+                redisUtil.unlock(lockKey);
+            }
             throw new CrmebException("订单生成失败");
         }
 
         // 删除缓存订单
         if (redisUtil.exists(key)) {
             redisUtil.delete(key);
+        }
+
+        // 释放分布式锁
+        if (orderInfoVo.getSeckillId() > 0) {
+            String lockKey = "seckill_lock:" + orderInfoVo.getSeckillId() + ":" + skuRecordList.get(0).getInt("activityAttrValueId");
+            redisUtil.unlock(lockKey);
         }
 
         // 加入自动未支付自动取消队列
@@ -1337,6 +1369,23 @@ public class OrderServiceImpl implements OrderService {
     private OrderInfoVo validatePreOrderRequest(PreOrderRequest request, User user) {
         OrderInfoVo orderInfoVo = new OrderInfoVo();
         List<OrderInfoDetailVo> detailVoList = CollUtil.newArrayList();
+
+        // 秒杀商品添加验证码校验，防止机器人抢购
+        if (request.getOrderDetails() != null && !request.getOrderDetails().isEmpty()) {
+            PreOrderDetailRequest detailRequest = request.getOrderDetails().get(0);
+            if (detailRequest.getSeckillId() > 0) {
+                if (StrUtil.isBlank(request.getCaptcha()) || StrUtil.isBlank(request.getCaptchaKey())) {
+                    throw new CrmebException("请输入验证码");
+                }
+                // 校验验证码
+                String redisCaptcha = redisUtil.get(request.getCaptchaKey());
+                if (StrUtil.isBlank(redisCaptcha) || !redisCaptcha.equalsIgnoreCase(request.getCaptcha())) {
+                    throw new CrmebException("验证码错误");
+                }
+                // 验证码校验成功后删除Redis中的验证码
+                redisUtil.delete(request.getCaptchaKey());
+            }
+        }
         if ("shoppingCart".equals(request.getPreOrderType())) {// 购物车购买
             detailVoList = validatePreOrderShopping(request, user);
             List<Long> cartIdList = request.getOrderDetails().stream().map(PreOrderDetailRequest::getShoppingCartId).distinct().collect(Collectors.toList());
@@ -1496,6 +1545,17 @@ public class OrderServiceImpl implements OrderService {
      * @return OrderInfoDetailVo
      */
     private OrderInfoDetailVo validatePreOrderSeckill(PreOrderDetailRequest detailRequest, User user) {
+        // 限流检查，每个用户每分钟最多访问5次秒杀预下单接口
+        String key = "seckill_preorder:" + user.getId();
+        String redisKey = "rate_limit:" + key;
+        Long count = redisUtil.incr(redisKey, 1);
+        if (count == 1) {
+            redisUtil.expire(redisKey, 60);
+        }
+        if (count > 5) {
+            throw new CrmebException("访问过于频繁，请稍后再试");
+        }
+
         Integer seckillId = detailRequest.getSeckillId();
         StoreSeckill storeSeckill = storeSeckillService.getByIdException(seckillId);
         if (storeSeckill.getStatus().equals(0)) {
