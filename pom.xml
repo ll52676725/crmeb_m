@@ -8,6 +8,7 @@
         <module>crmeb-service</module>
         <module>crmeb-admin</module>
         <module>crmeb-front</module>
+        <module>crmeb-search</module>
     </modules>
     <!--<parent>
         <groupId>org.springframework.boot</groupId>
@@ -312,6 +313,18 @@
     </dependencies>
     </dependencyManagement>
 
+    <repositories>
+        <repository>
+            <id>central</id>
+            <name>Maven Central Repository</name>
+            <url>https://repo.maven.apache.org/maven2</url>
+            <layout>default</layout>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+
     <build>
         <plugins>
             <plugin>
@@ -325,7 +338,7 @@
                     <!-- java8 保留参数名编译参数 -->
                     <compilerArgument>-parameters</compilerArgument>
                     <compilerArguments>
-                        <verbose/>
+                        <verbose/> 
                     </compilerArguments>
                     <!-- <failOnMissingWebXml>false</failOnMissingWebXml> -->
                 </configuration>
