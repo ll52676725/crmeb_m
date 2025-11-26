@@ -65,6 +65,13 @@ public interface StoreBargainUserHelpService extends IService<StoreBargainUserHe
     List<StoreBargainUserHelp> getHelpListByBargainUserId(Integer bargainUserId);
 
     /**
+     * 发送砍价失败提醒
+     * @param storeBargain 砍价活动信息
+     * @param storeBargainUser 砍价用户信息
+     */
+    void sendBargainFailNotification(StoreBargain storeBargain, StoreBargainUser storeBargainUser);
+
+    /**
      * 是否帮砍过
      * @param bargainUserId 用户砍价活动id
      * @param uid 用户uid
