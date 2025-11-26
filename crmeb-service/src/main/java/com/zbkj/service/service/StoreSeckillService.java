@@ -126,4 +126,39 @@ public interface StoreSeckillService extends IService<StoreSeckill> {
      * @return SeckillIndexResponse
      */
     SeckillIndexResponse getIndexInfo();
+
+    /**
+     * 预热库存到Redis
+     * @param seckillId 秒杀活动ID
+     */
+    void warmUpStock(Integer seckillId);
+
+    /**
+     * Redis预扣减库存
+     * @param seckillId 秒杀活动ID
+     * @param num 扣减数量
+     * @return 是否扣减成功
+     */
+    Boolean preDeductStock(Integer seckillId, Integer num);
+
+    /**
+     * 恢复Redis库存
+     * @param seckillId 秒杀活动ID
+     * @param num 恢复数量
+     */
+    void restoreStock(Integer seckillId, Integer num);
+
+    /**
+     * 获取Redis中的库存数量
+     * @param seckillId 秒杀活动ID
+     * @return 库存数量
+     */
+    Integer getStockFromRedis(Integer seckillId);
+
+    /**
+     * 获取Redis中的已售数量
+     * @param seckillId 秒杀活动ID
+     * @return 已售数量
+     */
+    Integer getSoldFromRedis(Integer seckillId);
 }

@@ -24,4 +24,22 @@ public class RedisConstatns {
     /** 商品加购量（每日） */
     public static final String PRO_ADD_CART_KEY = "statistics:product:add_cart:";
     public static final String PRO_PRO_ADD_CART_KEY = "statistics:product:pro_add_cart:{}:{}";
+
+    /** 秒杀活动缓存Key */
+    public static final String SECKILL_ACTIVITY_KEY = "seckill:activity:";
+
+    /** 秒杀商品库存缓存Key */
+    public static final String SECKILL_STOCK_KEY = "seckill:stock:";
+
+    /** 秒杀商品已售数量缓存Key */
+    public static final String SECKILL_SOLD_KEY = "seckill:sold:";
+
+    /** 秒杀用户购买限制缓存Key */
+    public static final String SECKILL_USER_LIMIT_KEY = "seckill:user:limit:";
+
+    /** 秒杀订单缓存Key */
+    public static final String SECKILL_ORDER_KEY = "seckill:order:";
+
+    /** 秒杀令牌桶缓存Key */
+    public static final String SECKILL_TOKEN_BUCKET_KEY = "seckill:token:bucket:";
 }

@@ -1507,6 +1507,12 @@ public class OrderServiceImpl implements OrderService {
         }
         commonValidateSeckill(storeSeckill, seckillAttrValue, user, detailRequest.getProductNum());
 
+        // Redis预扣减库存
+        Boolean deductSuccess = storeSeckillService.preDeductStock(seckillId, detailRequest.getProductNum());
+        if (!deductSuccess) {
+            throw new CrmebException("商品库存不足");
+        }
+
         OrderInfoDetailVo detailVo = new OrderInfoDetailVo();
         detailVo.setProductId(storeSeckill.getProductId());
         detailVo.setProductName(storeSeckill.getTitle());
