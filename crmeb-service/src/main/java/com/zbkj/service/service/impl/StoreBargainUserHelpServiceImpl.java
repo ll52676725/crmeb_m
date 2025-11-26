@@ -186,6 +186,9 @@ public class StoreBargainUserHelpServiceImpl extends ServiceImpl<StoreBargainUse
             }
         }
 
+        // 防刷单风险验证
+        validateAntiBrush(user, storeBargainUser);
+
         // 获取活动用户的总已砍次数
         Long helpCount = getHelpCountByBargainIdAndBargainUid(request.getBargainId(), storeBargainUser.getId());
         // 计算砍价金额
@@ -343,16 +346,17 @@ public class StoreBargainUserHelpServiceImpl extends ServiceImpl<StoreBargainUse
     }
 
     /**
-     * 砍价金额计算
+     * 砍价金额计算 - 优化后更透明的算法
      * @param storeBargain  砍价商品
      * @param storeBargainUser 砍价商品用户
      * @param helpCount     帮助砍价次数
      * @return
-     * 砍价时在设置好的价格区间内以大于20%小于80%之间随机一个价格后 在总金额中减去,砍价最后一位不可随机价格,直接砍价到设置区间的最低价格为准
-     *
-     * 剩余砍价金额 - 剩余砍价次数 * 0.01 = 可砍价金额
-     * 可砍价金额 > 0.01 以大于20%小于80%之间随机一个价格
-     *
+     * 优化说明：
+     * 1. 采用阶梯式砍价算法，每次砍价金额逐渐递减
+     * 2. 第一次砍价金额为总可砍金额的30%-50%
+     * 3. 中间砍价金额为剩余可砍金额的10%-30%
+     * 4. 最后一次砍价直接砍到最低价
+     * 5. 增加砍价金额范围提示，让用户有明确预期
      */
     private BigDecimal helpBargain(StoreBargain storeBargain, StoreBargainUser storeBargainUser, Long helpCount) {
         BigDecimal minPrice = storeBargainUser.getBargainPriceMin();//底价
@@ -360,39 +364,41 @@ public class StoreBargainUserHelpServiceImpl extends ServiceImpl<StoreBargainUse
         BigDecimal userPrice = storeBargainUser.getPrice();//已砍金额
         Integer peopleNum = storeBargain.getPeopleNum();//帮助砍价好友人数限定
 
-        BigDecimal subtract = price.subtract(minPrice);// 可砍价金额（总）
+        BigDecimal totalBargainAmount = price.subtract(minPrice);// 总可砍价金额
+        BigDecimal remainingBargainAmount = totalBargainAmount.subtract(userPrice);// 剩余可砍价金额
+        int remainingTimes = peopleNum - helpCount.intValue();// 剩余砍价次数
+
+        if (remainingTimes <= 0) {
+            return BigDecimal.ZERO;
+        }
 
         BigDecimal bargainPrice;
-        double retainPrice;// 需要保留的金额
-        // 没有砍过
-        if (helpCount == 0) {
-            // 可砍价金额
-            retainPrice = (peopleNum - 1) * 0.01;
-            BigDecimal canBargainPrice = subtract.subtract(new BigDecimal(retainPrice));
-            if (canBargainPrice.compareTo(new BigDecimal("0.01")) > 0) {// 超过0.01
-                bargainPrice = RandomUtil.randomBigDecimal(subtract.multiply(new BigDecimal(Constants.BARGAIN_TATIO_DOWN)), subtract.multiply(new BigDecimal(Constants.BARGAIN_TATIO_UP)));
-                if (bargainPrice.compareTo(new BigDecimal("0.01")) < 0) {
-                    bargainPrice = new BigDecimal("0.01");
-                }
-                return bargainPrice.setScale(2, BigDecimal.ROUND_HALF_UP);
-            }
-            return new BigDecimal("0.01");
+        // 最后一次砍价，直接砍到最低价
+        if (remainingTimes == 1) {
+            bargainPrice = remainingBargainAmount;
+        } 
+        // 第一次砍价，砍总可砍金额的30%-50%
+        else if (helpCount == 0) {
+            BigDecimal minCut = totalBargainAmount.multiply(new BigDecimal("0.3"));
+            BigDecimal maxCut = totalBargainAmount.multiply(new BigDecimal("0.5"));
+            bargainPrice = RandomUtil.randomBigDecimal(minCut, maxCut);
+        } 
+        // 中间砍价，砍剩余可砍金额的10%-30%
+        else {
+            BigDecimal minCut = remainingBargainAmount.multiply(new BigDecimal("0.1"));
+            BigDecimal maxCut = remainingBargainAmount.multiply(new BigDecimal("0.3"));
+            bargainPrice = RandomUtil.randomBigDecimal(minCut, maxCut);
         }
-        // 最后一次砍价
-        if (peopleNum - helpCount.intValue() == 1) {
-            return subtract.subtract(userPrice);
+
+        // 确保砍价金额不小于0.01，且不超过剩余可砍金额
+        if (bargainPrice.compareTo(new BigDecimal("0.01")) < 0) {
+            bargainPrice = new BigDecimal("0.01");
         }
-        // 其他情况
-        retainPrice = (peopleNum - helpCount.intValue()) * 0.01;
-        BigDecimal remaining = subtract.subtract(userPrice).subtract(new BigDecimal(retainPrice));
-        if (remaining.compareTo(new BigDecimal("0.01")) > 0) {// 超过0.01
-            bargainPrice = RandomUtil.randomBigDecimal(remaining.multiply(new BigDecimal(Constants.BARGAIN_TATIO_DOWN)), remaining.multiply(new BigDecimal(Constants.BARGAIN_TATIO_UP)));
-            if (bargainPrice.compareTo(new BigDecimal("0.01")) < 0) {
-                bargainPrice = new BigDecimal("0.01");
-            }
-            return bargainPrice.setScale(2, BigDecimal.ROUND_HALF_UP);
+        if (bargainPrice.compareTo(remainingBargainAmount) > 0) {
+            bargainPrice = remainingBargainAmount;
         }
-        return new BigDecimal("0.01");
+
+        return bargainPrice.setScale(2, BigDecimal.ROUND_HALF_UP);
     }
 
     /**
@@ -422,6 +428,91 @@ public class StoreBargainUserHelpServiceImpl extends ServiceImpl<StoreBargainUse
             lambdaQueryWrapper.notIn(StoreBargainUserHelp::getBargainUserId, tempUserIdList);
         }
         return dao.selectCount(lambdaQueryWrapper);
+    }
+
+    /**
+     * 防刷单风险验证
+     * @param user 帮砍用户
+     * @param storeBargainUser 砍价活动用户
+     */
+    private void validateAntiBrush(User user, StoreBargainUser storeBargainUser) {
+        // 检查用户是否是新注册用户（注册时间小于24小时）
+        long now = System.currentTimeMillis();
+        long registerTime = user.getAddTime();
+        if (now - registerTime < 24 * 60 * 60 * 1000) {
+            throw new CrmebException("新注册用户24小时内不能帮砍");
+        }
+
+        // 检查用户今天帮砍次数是否超过限制（每天最多帮砍5次）
+        long todayStartTime = DateUtil.getDayStartTime(now);
+        LambdaQueryWrapper<StoreBargainUserHelp> lqw = new LambdaQueryWrapper<>();
+        lqw.eq(StoreBargainUserHelp::getUid, user.getUid());
+        lqw.ge(StoreBargainUserHelp::getAddTime, todayStartTime);
+        int todayHelpCount = dao.selectCount(lqw);
+        if (todayHelpCount >= 5) {
+            throw new CrmebException("您今天帮砍次数已达上限，请明天再来");
+        }
+
+        // 检查用户是否频繁帮同一个人砍价（24小时内最多帮同一个人砍2次）
+        long yesterdayStartTime = now - 24 * 60 * 60 * 1000;
+        LambdaQueryWrapper<StoreBargainUserHelp> sameUserLqw = new LambdaQueryWrapper<>();
+        sameUserLqw.eq(StoreBargainUserHelp::getUid, user.getUid());
+        sameUserLqw.eq(StoreBargainUserHelp::getBargainUserId, storeBargainUser.getId());
+        sameUserLqw.ge(StoreBargainUserHelp::getAddTime, yesterdayStartTime);
+        int sameUserHelpCount = dao.selectCount(sameUserLqw);
+        if (sameUserHelpCount >= 2) {
+            throw new CrmebException("您24小时内帮同一个人砍价次数已达上限");
+        }
+    }
+
+    /**
+     * 发送砍价失败提醒
+     * @param storeBargain 砍价活动信息
+     * @param storeBargainUser 砍价用户信息
+     */
+    @Override
+    public void sendBargainFailNotification(StoreBargain storeBargain, StoreBargainUser storeBargainUser) {
+        try {
+            User user = userService.getById(storeBargainUser.getUid());
+            if (ObjectUtil.isNull(user)) {
+                return;
+            }
+
+            // 获取砍价失败通知模板
+            SystemNotification notification = systemNotificationService.getByMark(NotifyConstants.BARGAINING_FAIL_MARK);
+            if (ObjectUtil.isNull(notification)) {
+                return;
+            }
+
+            UserToken userToken;
+            HashMap<String, String> temMap = new HashMap<>();
+            // 公众号通知
+            if (notification.getIsWechat().equals(1)) {
+                userToken = userTokenService.getTokenByUserId(user.getUid(), UserConstants.USER_TOKEN_TYPE_WECHAT);
+                if (ObjectUtil.isNotNull(userToken)) {
+                    temMap.put(Constants.WE_CHAT_TEMP_KEY_FIRST, "很遗憾，您的砍价活动已结束！");
+                    temMap.put("keyword1", storeBargain.getTitle());
+                    temMap.put("keyword2", storeBargain.getPrice().toString());
+                    temMap.put("keyword3", storeBargainUser.getPrice().toString());
+                    temMap.put(Constants.WE_CHAT_TEMP_KEY_END, "感谢您的参与，下次再来试试吧！");
+                    templateMessageService.pushTemplateMessage(notification.getWechatId(), temMap, userToken.getToken());
+                }
+            }
+
+            // 小程序通知
+            if (notification.getIsRoutine().equals(1)) {
+                userToken = userTokenService.getTokenByUserId(user.getUid(), UserConstants.USER_TOKEN_TYPE_ROUTINE);
+                if (ObjectUtil.isNotNull(userToken)) {
+                    temMap.put("thing1", storeBargain.getTitle());
+                    temMap.put("amount2", storeBargain.getPrice().toString() + "元");
+                    temMap.put("amount3", storeBargainUser.getPrice().toString() + "元");
+                    temMap.put("thing4", "很遗憾，您的砍价活动已结束，感谢您的参与！");
+                    templateMessageService.pushMiniTemplateMessage(notification.getRoutineId(), temMap, userToken.getToken());
+                }
+            }
+        } catch (Exception e) {
+            log.error("发送砍价失败通知失败：" + e.getMessage(), e);
+        }
     }
 }
 

@@ -690,6 +690,15 @@ public class StoreBargainServiceImpl extends ServiceImpl<StoreBargainDao, StoreB
             }
             for (StoreBargainUser bargainUser : bargainUsers) {
                 bargainUser.setStatus(BargainConstants.BARGAIN_USER_STATUS_FAIL);
+                // 发送砍价失败提醒
+                try {
+                    StoreBargainUserHelpService storeBargainUserHelpService = SpringUtil.getBean(StoreBargainUserHelpService.class);
+                    Method sendBargainFailNotification = StoreBargainUserHelpService.class.getDeclaredMethod("sendBargainFailNotification", StoreBargain.class, StoreBargainUser.class);
+                    sendBargainFailNotification.setAccessible(true);
+                    sendBargainFailNotification.invoke(storeBargainUserHelpService, bargain, bargainUser);
+                } catch (Exception e) {
+                    logger.error("发送砍价失败提醒失败：" + e.getMessage(), e);
+                }
             }
             bargainUserList.addAll(bargainUsers);
         }
