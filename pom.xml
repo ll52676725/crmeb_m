@@ -8,6 +8,7 @@
         <module>crmeb-service</module>
         <module>crmeb-admin</module>
         <module>crmeb-front</module>
+        <module>crmeb-ai</module>
     </modules>
     <!--<parent>
         <groupId>org.springframework.boot</groupId>
