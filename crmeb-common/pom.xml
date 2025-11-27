@@ -214,12 +214,7 @@
             <artifactId>jedis</artifactId>
         </dependency>
 
-        <!-- 依赖 crmeb-service 模块 -->
-        <dependency>
-            <groupId>com.zbkj</groupId>
-            <artifactId>crmeb-service</artifactId>
-            <version>${project.version}</version>
-        </dependency>
+
         
         <!-- 分页插件 -->
         <dependency>
