@@ -90,12 +90,52 @@
             <artifactId>mybatis-plus</artifactId>
             <version>3.3.1</version>
         </dependency>
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-extension</artifactId>
+            <version>3.3.1</version>
+        </dependency>
 
         <!--generator-->
         <dependency>
             <groupId>com.baomidou</groupId>
             <artifactId>mybatis-plus-generator</artifactId>
             <version>3.3.1</version>
+        </dependency>
+        
+        <!-- MyBatis Plus 分表插件 -->
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>dynamic-datasource-spring-boot-starter</artifactId>
+            <version>3.3.1</version>
+        </dependency>
+        
+        <!-- ShardingSphere 分表 -->
+        <dependency>
+            <groupId>org.apache.shardingsphere</groupId>
+            <artifactId>sharding-jdbc-spring-boot-starter</artifactId>
+            <version>4.1.1</version>
+        </dependency>
+        
+        <!-- Elasticsearch -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-elasticsearch</artifactId>
+            <version>2.2.6.RELEASE</version>
+        </dependency>
+        
+        <!-- Elasticsearch 客户端 -->
+        <dependency>
+            <groupId>org.elasticsearch.client</groupId>
+            <artifactId>elasticsearch-rest-high-level-client</artifactId>
+            <version>6.8.6</version>
+        </dependency>
+        
+        <!-- Elasticsearch -->
+        <dependency>
+            <groupId>org.elasticsearch</groupId>
+            <artifactId>elasticsearch</artifactId>
+            <version>6.8.6</version>
         </dependency>
 
         <dependency>

@@ -33,9 +33,25 @@ spring:
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
     driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://127.0.0.1:3306/crmeb?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimeZone=GMT+8
+    url: jdbc:mysql://127.0.0.1:3306/crmeb?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimeZone=GMT+8&allowMultiQueries=true&rewriteBatchedStatements=true
     username: crmeb
     password: 111111
+    # Druid连接池配置
+    druid:
+      initial-size: 50
+      min-idle: 50
+      max-active: 200
+      max-wait: 60000
+      time-between-eviction-runs-millis: 60000
+      min-evictable-idle-time-millis: 300000
+      validation-query: SELECT 1 FROM DUAL
+      test-while-idle: true
+      test-on-borrow: false
+      test-on-return: false
+      pool-prepared-statements: true
+      max-pool-prepared-statement-per-connection-size: 20
+      filters: stat,wall,log4j
+      connection-properties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=5000
   redis:
     host: 127.0.0.1 #地址
     port: 6379 #端口
@@ -44,11 +60,12 @@ spring:
     database: 3  #默认数据库
     jedis:
       pool:
-        max-active: 200 # 连接池最大连接数（使用负值表示没有限制）
-        max-wait: -1 # 连接池最大阻塞等待时间（使用负值表示没有限制）
-        max-idle: 10 # 连接池中的最大空闲连接
-        min-idle: 0 # 连接池中的最小空闲连接
-        time-between-eviction-runs: -1 #逐出扫描的时间间隔(毫秒) 如果为负数,则不运行逐出线程, 默认-1
+        max-active: 500 # 连接池最大连接数（使用负值表示没有限制）
+        max-wait: 5000 # 连接池最大阻塞等待时间（毫秒）
+        max-idle: 50 # 连接池中的最大空闲连接
+        min-idle: 20 # 连接池中的最小空闲连接
+        time-between-eviction-runs: 30000 #逐出扫描的时间间隔(毫秒)
+        min-evictable-idle-time-millis: 60000 #连接的最小空闲时间(毫秒)
 
 debug: true
 logging:
@@ -80,3 +97,45 @@ swagger:
     check: false #是否打开验证
     username: #访问swagger的账号
     password: #访问swagger的密码
+
+# ShardingSphere 分表配置
+  shardingsphere:
+    datasource:
+      names: master
+      master:
+        type: com.alibaba.druid.pool.DruidDataSource
+        driver-class-name: com.mysql.jdbc.Driver
+        url: jdbc:mysql://127.0.0.1:3306/crmeb?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimeZone=GMT+8&allowMultiQueries=true&rewriteBatchedStatements=true
+        username: crmeb
+        password: 111111
+    sharding:
+      tables:
+        eb_store_order:
+          actual-data-nodes: master.eb_store_order_$->{0..9}
+          table-strategy:
+            standard:
+              sharding-column: uid
+              precise-algorithm-class-name: com.zbkj.common.config.ShardingSphereConfig
+        eb_store_order_info:
+          actual-data-nodes: master.eb_store_order_info_$->{0..9}
+          table-strategy:
+            standard:
+              sharding-column: order_id
+              precise-algorithm-class-name: com.zbkj.common.config.ShardingSphereConfig
+        eb_store_order_status:
+          actual-data-nodes: master.eb_store_order_status_$->{0..9}
+          table-strategy:
+            standard:
+              sharding-column: oid
+              precise-algorithm-class-name: com.zbkj.common.config.ShardingSphereConfig
+    props:
+      sql:
+        show: true
+  # Elasticsearch 配置
+  elasticsearch:
+    rest:
+      uris: http://localhost:9200
+      connection-timeout: 5000ms
+      read-timeout: 3000ms
+    username: elastic
+    password: changeme

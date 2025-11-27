@@ -96,6 +96,30 @@
             <artifactId>mybatis-plus-boot-starter</artifactId>
         </dependency>
 
+        <!-- ShardingSphere 分表 -->
+        <dependency>
+            <groupId>org.apache.shardingsphere</groupId>
+            <artifactId>sharding-jdbc-spring-boot-starter</artifactId>
+        </dependency>
+        
+        <!-- Elasticsearch -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-elasticsearch</artifactId>
+        </dependency>
+        
+        <!-- Elasticsearch 客户端 -->
+        <dependency>
+            <groupId>org.elasticsearch.client</groupId>
+            <artifactId>elasticsearch-rest-high-level-client</artifactId>
+        </dependency>
+        
+        <!-- Elasticsearch -->
+        <dependency>
+            <groupId>org.elasticsearch</groupId>
+            <artifactId>elasticsearch</artifactId>
+        </dependency>
+        
         <!-- 模板引擎 mybatis code generator时需要使用-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -113,6 +137,24 @@
         <dependency>
             <groupId>com.baomidou</groupId>
             <artifactId>mybatis-plus</artifactId>
+        </dependency>
+        
+        <!-- mybatis-plus-boot-starter -->
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-boot-starter</artifactId>
+        </dependency>
+        
+        <!-- mybatis-plus-extension -->
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-extension</artifactId>
+        </dependency>
+        
+        <!-- mybatis-plus-generator -->
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-generator</artifactId>
         </dependency>
 
         <!--generator-->
@@ -172,6 +214,8 @@
             <artifactId>jedis</artifactId>
         </dependency>
 
+
+        
         <!-- 分页插件 -->
         <dependency>
             <groupId>com.github.pagehelper</groupId>
