@@ -1,0 +1,42 @@
+spring:
+  application:
+    name: crmeb-ai
+  
+  # Spring AI配置
+  ai:
+    openai:
+      api-key: ${OPENAI_API_KEY:your-api-key}
+      base-url: ${OPENAI_BASE_URL:https://api.openai.com/v1}
+  
+  # 数据库配置
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:crmeb_ai}?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:root}
+  
+  # JPA配置（用于向量数据库）
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+  
+# 服务器配置
+server:
+  port: 8083
+  servlet:
+    context-path: /ai
+  
+# Swagger配置
+swagger:
+  base-package: com.zbkj.ai.controller
+  title: Crmeb AI API
+  description: 智能问答机器人API接口文档
+  version: 1.0.0
+  contact:
+    name: Crmeb
+    url: https://www.crmeb.com
+    email: support@crmeb.com

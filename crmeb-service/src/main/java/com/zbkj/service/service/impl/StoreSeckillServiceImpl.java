@@ -10,6 +10,7 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.zbkj.common.constants.Constants;
+import com.zbkj.common.constants.RedisConstatns;
 import com.zbkj.common.exception.CrmebException;
 import com.zbkj.common.model.product.StoreProduct;
 import com.zbkj.common.model.product.StoreProductAttr;
@@ -905,7 +906,7 @@ public class StoreSeckillServiceImpl extends ServiceImpl<StoreSeckillDao, StoreS
     private boolean doProductStock(StoreProductStockRequest storeProductStockRequest) {
         // 秒杀商品信息回滚
         StoreSeckill existProduct = getById(storeProductStockRequest.getSeckillId());
-        List<StoreProductAttrValue> existAttr =
+        List<StoreProductAttrValue> existAttr = 
                 storeProductAttrValueService.getListByProductIdAndAttrId(
                         storeProductStockRequest.getSeckillId(),
                         storeProductStockRequest.getAttrId().toString(),
@@ -948,6 +949,103 @@ public class StoreSeckillServiceImpl extends ServiceImpl<StoreSeckillDao, StoreS
             }
         }
         return true;
+    }
+
+    /**
+     * 预热秒杀商品库存到Redis
+     * @param seckillId 秒杀商品ID
+     */
+    @Override
+    public void warmUpStock(Integer seckillId) {
+        StoreSeckill seckill = getByIdException(seckillId);
+        if (seckill == null) {
+            throw new CrmebException("秒杀商品不存在");
+        }
+
+        // 预热商品库存
+        String stockKey = RedisConstatns.SECKILL_STOCK_KEY + seckillId;
+        redisUtil.set(stockKey, seckill.getStock());
+
+        // 预热已售数量
+        String soldKey = RedisConstatns.SECKILL_SOLD_KEY + seckillId;
+        redisUtil.set(soldKey, 0);
+
+        logger.info("预热秒杀商品库存到Redis成功，商品ID：{}", seckillId);
+    }
+
+    /**
+     * 从Redis预扣减秒杀商品库存
+     * @param seckillId 秒杀商品ID
+     * @param num 购买数量
+     * @return true-扣减成功，false-扣减失败
+     */
+    @Override
+    public Boolean preDeductStock(Integer seckillId, Integer num) {
+        String stockKey = RedisConstatns.SECKILL_STOCK_KEY + seckillId;
+        String soldKey = RedisConstatns.SECKILL_SOLD_KEY + seckillId;
+
+        // 检查库存是否充足
+        Integer stock = redisUtil.get(stockKey);
+        if (stock == null || stock < num) {
+            logger.info("秒杀商品库存不足，商品ID：{}", seckillId);
+            return false;
+        }
+
+        // 扣减库存
+        Long newStock = redisUtil.incr(stockKey, -num);
+        if (newStock < 0) {
+            // 库存扣减失败，恢复库存
+            redisUtil.incr(stockKey, num);
+            logger.info("秒杀商品库存扣减失败，商品ID：{}", seckillId);
+            return false;
+        }
+
+        // 增加已售数量
+        redisUtil.incr(soldKey, num);
+        logger.info("秒杀商品库存预扣减成功，商品ID：{}", seckillId);
+        return true;
+    }
+
+    /**
+     * 恢复Redis中的秒杀商品库存
+     * @param seckillId 秒杀商品ID
+     * @param num 恢复数量
+     */
+    @Override
+    public void restoreStock(Integer seckillId, Integer num) {
+        String stockKey = RedisConstatns.SECKILL_STOCK_KEY + seckillId;
+        String soldKey = RedisConstatns.SECKILL_SOLD_KEY + seckillId;
+
+        // 恢复库存
+        redisUtil.incr(stockKey, num);
+
+        // 减少已售数量
+        redisUtil.incr(soldKey, -num);
+
+        logger.info("恢复秒杀商品库存到Redis成功，商品ID：{}", seckillId);
+    }
+
+    /**
+     * 获取Redis中的秒杀商品库存
+     * @param seckillId 秒杀商品ID
+     * @return 库存数量
+     */
+    @Override
+    public Integer getStockFromRedis(Integer seckillId) {
+        String stockKey = RedisConstatns.SECKILL_STOCK_KEY + seckillId;
+        return redisUtil.get(stockKey);
+    }
+
+    /**
+     * 获取Redis中的秒杀商品已售数量
+     * @param seckillId 秒杀商品ID
+     * @return 已售数量
+     */
+    @Override
+    public Integer getSoldFromRedis(Integer seckillId) {
+        String soldKey = RedisConstatns.SECKILL_SOLD_KEY + seckillId;
+        Integer sold = redisUtil.get(soldKey);
+        return sold != null ? sold : 0;
     }
 
 }
