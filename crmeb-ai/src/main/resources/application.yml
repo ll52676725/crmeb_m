@@ -1,0 +1,47 @@
+# 服务器配置
+server:
+  port: 8083
+  servlet:
+    context-path: /ai
+
+# Spring AI 配置
+spring:
+  ai:
+    openai:
+      api-key: ${OPENAI_API_KEY:your-api-key}
+      base-url: ${OPENAI_BASE_URL:https://api.openai.com/v1}
+      chat:
+        model: gpt-3.5-turbo
+        temperature: 0.7
+      embedding:
+        model: text-embedding-ada-002
+    vectorstore:
+      pgvector:
+        enabled: true
+        datasource:
+          url: jdbc:postgresql://localhost:5432/crmeb_ai
+          username: postgres
+          password: password
+        index-type: HNSW
+        dimensions: 1536
+
+# 知识库配置
+ai:
+  knowledge-base:
+    chunk-size: 1000
+    chunk-overlap: 200
+    document-path: /data/ai/documents
+
+# Swagger 配置
+swagger:
+  basic:
+    enable: true
+    check: false
+    username: admin
+    password: 123456
+
+# 日志配置
+logging:
+  level:
+    com.zbkj.ai: debug
+    org.springframework.ai: debug
