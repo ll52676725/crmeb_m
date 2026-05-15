@@ -1,4 +1,4 @@
-﻿package com.zbkj.admin;
+﻿﻿﻿﻿package com.zbkj.admin;
 
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;

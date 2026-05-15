@@ -1,4 +1,4 @@
-﻿package com.zbkj.admin.config;
+﻿﻿﻿﻿package com.zbkj.admin.config;
 
 import com.zbkj.common.constants.Constants;
 import io.swagger.v3.oas.models.Components;
