@@ -1,4 +1,4 @@
-package com.zbkj.common.model.user;
+﻿package com.zbkj.common.model.user;
 
 import java.math.BigDecimal;
 

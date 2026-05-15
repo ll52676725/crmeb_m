@@ -13,7 +13,7 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import javax.xml.parsers.DocumentBuilder;
+import jakarta.xml.parsers.DocumentBuilder;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.*;

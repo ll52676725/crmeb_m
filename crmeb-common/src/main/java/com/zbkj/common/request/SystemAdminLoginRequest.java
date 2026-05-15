@@ -1,10 +1,10 @@
-package com.zbkj.common.request;
+﻿package com.zbkj.common.request;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import org.hibernate.validator.constraints.Length;
 
-import javax.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotEmpty;
 
 /**
  * PC登录请求对象

@@ -1,4 +1,4 @@
-package com.zbkj.common.model.express;
+﻿package com.zbkj.common.model.express;
 
 import java.math.BigDecimal;
 import com.baomidou.mybatisplus.annotation.TableName;

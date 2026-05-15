@@ -8,7 +8,7 @@ import com.zbkj.service.dao.SmsTemplateDao;
 import com.zbkj.service.service.SmsTemplateService;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 
 /**
  * SmsTemplateServiceImpl 接口实现

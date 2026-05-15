@@ -1,4 +1,4 @@
-package com.zbkj.common.request;
+﻿package com.zbkj.common.request;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.zbkj.common.constants.RegularConstants;
@@ -11,7 +11,7 @@ import lombok.experimental.Accessors;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.Range;
 
-import javax.validation.constraints.*;
+import jakarta.validation.constraints.*;
 import java.io.Serializable;
 
 /**

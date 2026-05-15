@@ -1,4 +1,4 @@
-package com.zbkj.common.response;
+﻿package com.zbkj.common.response;
 
 import com.zbkj.common.vo.AliPayJsResultVo;
 import com.zbkj.common.vo.WxPayJsResultVo;

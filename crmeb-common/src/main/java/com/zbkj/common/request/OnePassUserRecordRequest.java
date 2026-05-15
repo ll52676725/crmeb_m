@@ -1,4 +1,4 @@
-package com.zbkj.common.request;
+﻿package com.zbkj.common.request;
 
 import com.zbkj.common.annotation.StringContains;
 import com.zbkj.common.constants.Constants;
@@ -9,7 +9,7 @@ import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 import org.hibernate.validator.constraints.Range;
 
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank;
 
 /**
  * 一号通用量记录请求对象

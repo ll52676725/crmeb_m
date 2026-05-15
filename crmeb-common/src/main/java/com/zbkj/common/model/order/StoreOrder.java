@@ -1,4 +1,4 @@
-package com.zbkj.common.model.order;
+﻿package com.zbkj.common.model.order;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;

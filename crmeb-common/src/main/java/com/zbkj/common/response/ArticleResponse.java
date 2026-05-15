@@ -1,4 +1,4 @@
-package com.zbkj.common.response;
+﻿package com.zbkj.common.response;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;

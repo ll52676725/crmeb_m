@@ -7,7 +7,7 @@ import com.zbkj.service.dao.StoreProductCouponDao;
 import com.zbkj.service.service.StoreProductCouponService;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.util.List;
 
 /**

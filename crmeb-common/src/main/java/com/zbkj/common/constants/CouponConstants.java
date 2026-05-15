@@ -1,4 +1,4 @@
-package com.zbkj.common.constants;
+﻿package com.zbkj.common.constants;
 
 /**
  * 优惠券常量类

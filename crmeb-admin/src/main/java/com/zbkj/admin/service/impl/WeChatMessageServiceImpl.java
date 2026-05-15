@@ -1,4 +1,4 @@
-package com.zbkj.admin.service.impl;
+﻿package com.zbkj.admin.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
 import com.zbkj.common.constants.WeChatConstants;
@@ -20,7 +20,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.Map;
 
 

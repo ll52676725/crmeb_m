@@ -1,4 +1,4 @@
-package com.zbkj.admin.manager;
+﻿package com.zbkj.admin.manager;
 
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderNotFoundException;

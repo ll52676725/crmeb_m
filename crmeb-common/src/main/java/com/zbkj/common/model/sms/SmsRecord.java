@@ -1,4 +1,4 @@
-package com.zbkj.common.model.sms;
+﻿package com.zbkj.common.model.sms;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;

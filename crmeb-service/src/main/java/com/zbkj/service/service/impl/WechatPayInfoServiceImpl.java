@@ -8,7 +8,7 @@ import com.zbkj.service.dao.WechatPayInfoDao;
 import com.zbkj.service.service.WechatPayInfoService;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 
 /**
  *  WechatPayInfoServiceImpl 接口实现

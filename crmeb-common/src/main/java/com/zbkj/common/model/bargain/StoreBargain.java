@@ -1,4 +1,4 @@
-package com.zbkj.common.model.bargain;
+﻿package com.zbkj.common.model.bargain;
 
 import java.math.BigDecimal;
 

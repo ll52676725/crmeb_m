@@ -1,4 +1,4 @@
-package com.zbkj.common.model.gencode.mysql;
+﻿package com.zbkj.common.model.gencode.mysql;
 
 import java.util.List;
 

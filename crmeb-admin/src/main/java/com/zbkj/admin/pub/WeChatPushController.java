@@ -1,4 +1,4 @@
-package com.zbkj.admin.pub;
+﻿package com.zbkj.admin.pub;
 
 import com.alibaba.fastjson.JSONObject;
 import com.zbkj.common.response.CommonResult;
@@ -10,7 +10,7 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;

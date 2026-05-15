@@ -1,4 +1,4 @@
-package com.zbkj.common.constants;
+﻿package com.zbkj.common.constants;
 
 /**
  * 定时任务常量类

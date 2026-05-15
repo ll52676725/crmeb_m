@@ -1,4 +1,4 @@
-package com.zbkj.common.model.express;
+﻿package com.zbkj.common.model.express;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.IdType;

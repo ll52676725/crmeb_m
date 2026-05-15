@@ -1,4 +1,4 @@
-package com.zbkj.admin.filter;
+﻿package com.zbkj.admin.filter;
 
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
@@ -7,8 +7,8 @@ import com.zbkj.common.utils.RedisUtil;
 import com.zbkj.common.vo.LoginUserVo;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 

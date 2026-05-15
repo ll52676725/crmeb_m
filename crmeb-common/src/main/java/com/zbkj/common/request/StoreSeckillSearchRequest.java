@@ -1,4 +1,4 @@
-package com.zbkj.common.request;
+﻿package com.zbkj.common.request;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;

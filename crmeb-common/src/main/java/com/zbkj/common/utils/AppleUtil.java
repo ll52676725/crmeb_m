@@ -83,15 +83,20 @@ public class AppleUtil {
             aud = JSONObject.parseObject(claim).get("aud").toString();
             sub = JSONObject.parseObject(claim).get("sub").toString();
         }
-        JwtParser jwtParser = Jwts.parser().setSigningKey(publicKey);
-        jwtParser.requireIssuer("https://appleid.apple.com");
-        jwtParser.requireAudience(aud);
-        jwtParser.requireSubject(sub);
-
+        
+        // JJWT 0.12.x 新 API
         try {
-            Jws<Claims> claim = jwtParser.parseClaimsJws(jwt);
-            if (claim != null && claim.getBody().containsKey("auth_time")) {
-                System.out.println(claim);
+            Claims claims = Jwts.parser()
+                    .verifyWith(publicKey)
+                    .requireIssuer("https://appleid.apple.com")
+                    .requireAudience(aud)
+                    .requireSubject(sub)
+                    .build()
+                    .parseSignedClaims(jwt)
+                    .getPayload();
+            
+            if (claims != null && claims.containsKey("auth_time")) {
+                System.out.println(claims);
                 return true;
             }
             return false;

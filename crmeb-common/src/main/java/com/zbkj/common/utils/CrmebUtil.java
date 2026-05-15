@@ -10,7 +10,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.zbkj.common.constants.Constants;
 import org.apache.commons.lang3.StringUtils;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;

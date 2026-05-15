@@ -9,7 +9,7 @@ import com.zbkj.service.dao.SystemRoleMenuDao;
 import com.zbkj.service.service.SystemRoleMenuService;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.util.List;
 import java.util.stream.Collectors;
 

@@ -3,8 +3,8 @@ package com.zbkj.common.validation;
 import cn.hutool.core.util.StrUtil;
 import com.zbkj.common.annotation.StringContains;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;

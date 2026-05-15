@@ -5,7 +5,7 @@ import com.zbkj.common.request.LoginMobileRequest;
 import com.zbkj.common.request.LoginRequest;
 import com.zbkj.common.response.LoginResponse;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * 移动端登录服务类

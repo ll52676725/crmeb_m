@@ -1,4 +1,4 @@
-package com.zbkj.admin.config;
+﻿package com.zbkj.admin.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

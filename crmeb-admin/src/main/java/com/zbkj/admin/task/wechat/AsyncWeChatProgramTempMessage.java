@@ -1,4 +1,4 @@
-package com.zbkj.admin.task.wechat;
+﻿package com.zbkj.admin.task.wechat;
 
 import com.zbkj.common.utils.DateUtil;
 import com.zbkj.service.service.TemplateMessageService;

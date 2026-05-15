@@ -1,4 +1,4 @@
-package com.zbkj.common.request;
+﻿package com.zbkj.common.request;
 
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;

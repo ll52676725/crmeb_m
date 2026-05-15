@@ -8,7 +8,7 @@ import com.zbkj.service.dao.StoreProductAttrResultDao;
 import com.zbkj.service.service.StoreProductAttrResultService;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.util.List;
 
 /**

@@ -1,4 +1,4 @@
-package com.zbkj.admin.controller;
+﻿package com.zbkj.admin.controller;
 
 import com.zbkj.common.page.CommonPage;
 import com.zbkj.common.response.CommonResult;
@@ -23,7 +23,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;

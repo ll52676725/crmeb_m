@@ -6,7 +6,7 @@ import com.zbkj.service.dao.StoreProductLogDao;
 import com.zbkj.service.service.StoreProductLogService;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 
 /**
  * StoreProductLogServiceImpl 接口实现

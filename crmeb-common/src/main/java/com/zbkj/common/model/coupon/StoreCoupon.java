@@ -1,4 +1,4 @@
-package com.zbkj.common.model.coupon;
+﻿package com.zbkj.common.model.coupon;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;

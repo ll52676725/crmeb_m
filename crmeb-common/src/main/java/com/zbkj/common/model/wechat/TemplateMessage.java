@@ -1,4 +1,4 @@
-package com.zbkj.common.model.wechat;
+﻿package com.zbkj.common.model.wechat;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.IdType;

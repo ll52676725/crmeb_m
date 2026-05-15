@@ -6,7 +6,7 @@ import com.zbkj.service.dao.SmsRecordDao;
 import com.zbkj.service.service.SmsRecordService;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 
 /**
  * SmsRecordServiceImpl 接口实现

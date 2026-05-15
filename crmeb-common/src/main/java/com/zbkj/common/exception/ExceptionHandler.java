@@ -1,4 +1,4 @@
-package com.zbkj.common.exception;
+﻿package com.zbkj.common.exception;
 
 /**
  *  Exception 接口定义

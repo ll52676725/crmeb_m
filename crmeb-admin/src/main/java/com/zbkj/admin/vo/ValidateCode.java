@@ -1,4 +1,4 @@
-package com.zbkj.admin.vo;
+﻿package com.zbkj.admin.vo;
 
 
 import java.io.Serializable;

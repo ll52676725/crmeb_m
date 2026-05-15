@@ -7,7 +7,7 @@ import com.zbkj.service.dao.UserTokenDao;
 import com.zbkj.service.service.UserTokenService;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 
 /**
  * UserTokenServiceImpl 接口实现

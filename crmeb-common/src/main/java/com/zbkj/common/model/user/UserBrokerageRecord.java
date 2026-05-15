@@ -1,4 +1,4 @@
-package com.zbkj.common.model.user;
+﻿package com.zbkj.common.model.user;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;

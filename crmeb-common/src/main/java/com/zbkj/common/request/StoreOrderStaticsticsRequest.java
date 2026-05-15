@@ -1,4 +1,4 @@
-package com.zbkj.common.request;
+﻿package com.zbkj.common.request;
 
 import com.zbkj.common.constants.Constants;
 import com.fasterxml.jackson.annotation.JsonIgnore;

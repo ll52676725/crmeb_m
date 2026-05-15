@@ -10,7 +10,7 @@ import com.zbkj.service.dao.StoreProductAttrDao;
 import com.zbkj.service.service.StoreProductAttrService;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.util.List;
 
 /**

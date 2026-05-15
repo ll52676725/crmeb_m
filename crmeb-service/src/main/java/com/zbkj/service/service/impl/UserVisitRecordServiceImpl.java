@@ -7,7 +7,7 @@ import com.zbkj.service.dao.UserVisitRecordDao;
 import com.zbkj.service.service.UserVisitRecordService;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 
 /**
  * UserVisitRecordServiceImpl 接口实现

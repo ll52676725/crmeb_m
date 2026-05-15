@@ -1,4 +1,4 @@
-package com.zbkj.admin.config;
+﻿package com.zbkj.admin.config;
 
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer;

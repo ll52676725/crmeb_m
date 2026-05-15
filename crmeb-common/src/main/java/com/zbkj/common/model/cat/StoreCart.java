@@ -1,4 +1,4 @@
-package com.zbkj.common.model.cat;
+﻿package com.zbkj.common.model.cat;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;

@@ -1,4 +1,4 @@
-package com.zbkj.common.model.seckill;
+﻿package com.zbkj.common.model.seckill;
 
 import java.math.BigDecimal;
 import com.baomidou.mybatisplus.annotation.TableName;

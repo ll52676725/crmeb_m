@@ -1,4 +1,4 @@
-package com.zbkj.common.model.article;
+﻿package com.zbkj.common.model.article;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;

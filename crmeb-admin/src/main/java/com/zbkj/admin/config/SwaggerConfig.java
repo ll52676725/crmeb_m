@@ -1,27 +1,17 @@
-package com.zbkj.admin.config;
+﻿package com.zbkj.admin.config;
 
 import com.zbkj.common.constants.Constants;
-import com.google.common.base.Predicate;
+import io.swagger.v3.oas.models.Components;
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
+import io.swagger.v3.oas.models.security.SecurityScheme;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import springfox.documentation.builders.ApiInfoBuilder;
-import springfox.documentation.builders.PathSelectors;
-import springfox.documentation.builders.RequestHandlerSelectors;
-import springfox.documentation.service.*;
-import springfox.documentation.spi.DocumentationType;
-import springfox.documentation.spi.service.contexts.SecurityContext;
-import springfox.documentation.spring.web.plugins.Docket;
-import springfox.documentation.swagger2.annotations.EnableSwagger2;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import static com.google.common.collect.Lists.newArrayList;
 
 /**
- * Swagger配置组件
+ * SpringDoc OpenAPI 配置组件（替代 SpringFox Swagger）
  * +----------------------------------------------------------------------
  * | CRMEB [ CRMEB赋能开发者，助力企业发展 ]
  * +----------------------------------------------------------------------
@@ -33,12 +23,7 @@ import static com.google.common.collect.Lists.newArrayList;
  * +----------------------------------------------------------------------
  */
 @Configuration
-@EnableSwagger2
-@ConfigurationProperties(prefix = "api.doc")
-public class SwaggerConfig{
-
-    //是否开启swagger，正式环境一般是需要关闭的，可根据springboot的多环境配置进行设置
-    Boolean swaggerEnabled = true;
+public class SwaggerConfig {
 
     @Value("${server.port}")
     private String port;
@@ -46,84 +31,30 @@ public class SwaggerConfig{
     @Value("${crmeb.domain}")
     private String domain;
 
-    @Bean("admin")
-    public Docket createRestApis() {
-        return new Docket(DocumentationType.SWAGGER_2)
-                .groupName("admin")
-                .host(domain)
-                .apiInfo(apiInfo())
-                // 是否开启
-                .enable(swaggerEnabled)
-                .select()
-                // 扫描的路径包
-                .apis(RequestHandlerSelectors.basePackage("com.zbkj.admin"))
-                // 指定路径处理PathSelectors.any()代表所有的路径
-                .paths(adminPathsAnt())
-                .build()
-                .securitySchemes(security())
-                .securityContexts(securityContexts())
-//                .globalOperationParameters(pars) // 针对单个url的验证 如果需要的话
-                .pathMapping("/");
-    }
-
-    @Bean("public")
-    public Docket create2RestApis() {
-        return new Docket(DocumentationType.SWAGGER_2)
-                .groupName("public")
-                .host(domain)
-                .apiInfo(apiInfo())
-                // 是否开启
-                .enable(swaggerEnabled)
-                .select()
-                // 扫描的路径包
-                .apis(RequestHandlerSelectors.basePackage("com.zbkj.admin"))
-                // 指定路径处理PathSelectors.any()代表所有的路径
-                .paths(publicPathsAnt()) //只监听
-                .build()
-                .securitySchemes(security())
-                .securityContexts(securityContexts())
-//                .globalOperationParameters(pars) // 针对单个url的验证 如果需要的话
-                .pathMapping("/");
-    }
-
-    private Predicate<String> adminPathsAnt() {
-        return PathSelectors.ant("/api/admin/**");
-    }
-
-    private Predicate<String> publicPathsAnt() {
-        return PathSelectors.ant("/api/public/**");
-    }
-
-    private List<ApiKey> security() {
-        return newArrayList(
-                new ApiKey(Constants.HEADER_AUTHORIZATION_KEY, Constants.HEADER_AUTHORIZATION_KEY, "header")
-        );
-    }
-
-    private ApiInfo apiInfo() {
-        return new ApiInfoBuilder()
-                .title("Crmeb Java")
-                .description("Crmeb")
-                .termsOfServiceUrl("http://host:port")
-                .version("1.0.0").build();
-    }
-
-
-    private List<SecurityContext> securityContexts() {
-        List<SecurityContext> res = new ArrayList<>();
-        res.add(SecurityContext.builder()
-                .securityReferences(defaultAuth())
-                .forPaths(PathSelectors.regex("/.*"))
-                .build());
-        return res;
-    }
-
-    private List<SecurityReference> defaultAuth() {
-        List<SecurityReference> res = new ArrayList<>();
-        AuthorizationScope authorizationScope = new AuthorizationScope("global", Constants.HEADER_AUTHORIZATION_KEY);
-        AuthorizationScope[] authorizationScopes = new AuthorizationScope[1];
-        authorizationScopes[0] = authorizationScope;
-        res.add(new SecurityReference(Constants.HEADER_AUTHORIZATION_KEY, authorizationScopes));
-        return res;
+    /**
+     * 配置 OpenAPI 基本信息和安全认证
+     * 访问地址：http://localhost:{port}/swagger-ui.html
+     */
+    @Bean
+    public OpenAPI customOpenAPI() {
+        final String securitySchemeName = Constants.HEADER_AUTHORIZATION_KEY;
+        
+        return new OpenAPI()
+                .info(new Info()
+                        .title("Crmeb Java")
+                        .description("Crmeb")
+                        .version("1.0.0")
+                )
+                .addSecurityItem(new SecurityRequirement().addList(securitySchemeName))
+                .components(new Components()
+                        .addSecuritySchemes(securitySchemeName,
+                                new SecurityScheme()
+                                        .name(securitySchemeName)
+                                        .type(SecurityScheme.Type.APIKEY)
+                                        .in(SecurityScheme.In.HEADER)
+                                        .scheme("bearer")
+                                        .bearerFormat("JWT")
+                        )
+                );
     }
 }
